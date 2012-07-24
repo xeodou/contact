@@ -12,7 +12,8 @@
   </div>
   <div class="control-group">
     <label>电话号码</label>
-    <input name="tel" type="text" class="span3" placeholder="电话号码" value="<%- data.tel %>" />
+    <input name="tel" type="text" class="span3" placeholder="电话号码" value="<%- data.tel %>" onkeyup="this.value=this.value.replace(/[^\d]/,'')"/>
+    <button class="btn btn-info">添加</button>
     <span class="help-block"></span>
   </div>
   <div class="control-group">
