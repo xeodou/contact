@@ -1,0 +1,21 @@
+<h1>登陆</h1>
+<p>请回答以下问题</p>
+<form action="/login.do" method="POST">
+<% for (var i = 0, l = q.length; i < l; i++) { %>
+  <div class="control-group">
+    <span class="help-block"><%- q[i][0] %></span>
+    <input name="a[]" type="text" class="span3" placeholder="" />
+  </div>
+<% } %>
+  <div class="control-group">
+    <label class="checkbox">
+      <input type="checkbox" name="remeber"> 记住我
+    </label>
+  </div>
+  <input type="hidden" name="_csrf" value="<%- _csrf %>" />
+  <input type="submit" class="btn btn-success" value="提交" />
+</form>
+<p>建议使用<a href="http://google.com/chrome" target="_blank">Chrome浏览器</a></p>
+<script>
+$('.nav').hide();
+</script>

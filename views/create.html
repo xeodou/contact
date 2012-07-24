@@ -1,0 +1,35 @@
+<h1>添加</h1>
+<div class="alert alert-info">
+  <button class="close" data-dismiss="alert">×</button>
+  <strong>注意！</strong> 添加前请仔细检查一下之前是否已经添加过了，一个学号只能有一条记录。<br />如果之前已经添加过，可以直接在之前的信息上进行修改或者先删除后再重新添加。
+</div>
+<form action="/create.do" method="POST">
+  <div class="control-group">
+    <label>尊姓大名</label>
+    <input name="name" type="text" class="span3" placeholder="尊姓大名" />
+    <span class="help-block">请填写中文全称，不要用火星文</span>
+  </div>
+  <div class="control-group">
+    <label>学号</label>
+    <input name="id" type="text" class="span3" placeholder="学号" />
+    <span class="help-block"></span>
+  </div>
+  <div class="control-group">
+    <label>电话号码</label>
+    <input name="tel" type="text" class="span3" placeholder="电话号码" />
+    <span class="help-block"></span>
+  </div>
+  <div class="control-group">
+    <label>微博</label>
+    <input name="weibo" type="text" class="span3" placeholder="微博" />
+    <span class="help-block">没有可不填，如果有，请直接填微博名</span>
+  </div>
+  <div class="control-group">
+    <label>目前所在城市</label>
+    <input name="location" type="text" class="span3" placeholder="目前所在城市" />
+    <span class="help-block">可不填，但是建议填，方便蹭饭</span>
+  </div>
+  <input type="hidden" name="_csrf" value="<%- _csrf %>" />
+  <input type="submit" class="btn btn-success" value="提交" />
+  <a href="/">取消</a>
+</form>

@@ -1,0 +1,32 @@
+<h1>编辑</h1>
+<form action="/update.do" method="POST">
+  <div class="control-group">
+    <label>尊姓大名</label>
+    <input name="name" type="text" class="span3" placeholder="尊姓大名" value="<%- data.name %>" />
+    <span class="help-block">请填写中文全称，不要用火星文</span>
+  </div>
+  <div class="control-group">
+    <label>学号</label>
+    <input type="text" class="span3" placeholder="学号" value="<%- data.id %>" disabled="disabled" />
+    <span class="help-block"></span>
+  </div>
+  <div class="control-group">
+    <label>电话号码</label>
+    <input name="tel" type="text" class="span3" placeholder="电话号码" value="<%- data.tel %>" />
+    <span class="help-block"></span>
+  </div>
+  <div class="control-group">
+    <label>微博</label>
+    <input name="weibo" type="text" class="span3" placeholder="微博" value="<%- data.weibo %>" />
+    <span class="help-block">没有可不填，如果有，请直接填微博名</span>
+  </div>
+  <div class="control-group">
+    <label>目前所在城市</label>
+    <input name="location" type="text" class="span3" placeholder="目前所在城市" value="<%- data.location %>" />
+    <span class="help-block">可不填，但是建议填，方便蹭饭</span>
+  </div>
+  <input type="hidden" name="id" value="<%- data.id %>" />
+  <input type="hidden" name="_csrf" value="<%- _csrf %>" />
+  <input type="submit" class="btn btn-success" value="提交" />
+  <a href="/">取消</a>
+</form>

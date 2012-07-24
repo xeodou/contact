@@ -1,0 +1,79 @@
+<h1></h1>
+<p>为了今后大家更方便地保持联系，请大家及时更新自己的联系方式。不要随意修改别人的信息~</p>
+<div class="alert-area"></div>
+<table class="table table-striped table-bordered">
+  <thead style="background-color:white;">
+    <tr>
+      <th>学号</th>
+      <th>姓名</th>
+      <th>电话号码</th>
+      <th>微博</th>
+      <th>所在地</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%
+  for (var i = 0, l = contacts.length; i < l; i++) {
+    var o = contacts[i];
+%>
+    <tr>
+      <td><%- o['id'] %></td>
+      <td><%- o['name'] %></td>
+      <td><%- o['tel'] %></td>
+      <td><a href="http://weibo.com/<%- o['weibo'] %>" target="_blank">http://weibo.com/<%- o['weibo'] %></a></td>
+      <td><%- o['location'] %></td>
+      <td>
+        <a href="/update?id=<%- o['id'] %>">编辑</a> | 
+        <a class="doDelete" data="<%- o['id'] %>" href="/delete?id=<%- o['id'] %>">删除</a>
+      </td>
+    </tr>
+<%
+  }
+%>
+  </tbody>
+</table>
+<script>
+var _csrf = '<%- _csrf %>';
+var alertAreaNode = $(".alert-area");
+var stat = "ready";
+var doDelete = function (o) {
+  if (stat !== "ready") return;
+  var id = o.attr("data");
+  if (!id) return;
+
+  $.ajax({
+    type: "POST",
+    url: "/delete.do",
+    data: {id: id, _csrf: _csrf},
+    dataType: "JSON",
+    cache: false,
+    timeout: false,
+    beforeSend: function () {
+      stat = "pending";
+    },
+    success: function (resp) {
+      stat = "ready";
+      if (!resp || !resp.stat || resp.stat !== 1) {
+        var alert = $('<div class="alert alert-error fade in"><button class="close" data-dismiss="alert">×</button>删除时遇到错误。请重新试一下。</div>');
+        alert.appendTo(alertAreaNode);
+        return;
+      }
+      var trNode = o.parent().parent();
+      trNode.remove(); // 删除这一行
+    },
+    error: function () {
+      stat = "ready";
+      var alert = $('<div class="alert alert-error fade in"><button class="close" data-dismiss="alert">×</button>删除时遇到错误。请重新试一下。</div>');
+      alert.appendTo(alertAreaNode);
+      return;
+    }
+  });
+};
+$(".doDelete").live("click", function () {
+  if (confirm("该操作不可逆，确定要删除吗？")) {
+    doDelete($(this));
+  }
+  return false;
+});
+</script>
