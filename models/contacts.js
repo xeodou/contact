@@ -11,6 +11,7 @@ var contact = {
 	location : '',
 	tel : []
 };
+exports.contact = contact;
 
 exports.insert = function (data, next) {
   contacts.insert(data, next);
