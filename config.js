@@ -2,7 +2,7 @@ var config = {};
 // for web
 config.port = 2013;
 config.sitename = '常联系';
-config.version = '2012072401';
+config.version = '2012072501';
 config.session_secret = 'I am a secret.';
 config.session_timeout = 1000 * 60 * 60 * 24 * 14;
 config.statCode = {
