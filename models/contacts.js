@@ -5,11 +5,11 @@ var contacts = db.collection(mongo.collections.contacts);
 contacts.ensureIndex({'id': 1}, {'unique': true}, function() { });
 
 var contact = {
-	id : '',
-	name :　'',
-	weibo : '',
-	location : '',
-	tel : []
+	'id' : '',
+	'name' :　'',
+	'weibo' : '',
+	'location' : '',
+	'tel' : []
 };
 exports.contact = contact;
 
