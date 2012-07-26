@@ -20,7 +20,14 @@
     <tr>
       <td><%- o['id'] %></td>
       <td><%- o['name'] %></td>
-      <td><%- o['tel'] %></td>
+      <td>
+        <% for(var j = 0 ,k = o['tel'].length; j < k ; j++){%>
+          <%- o['tel'][j][0]%> 
+          <% if(((new Date(o['tel'][j][1])).getMonth() - (new Date()).getMonth()) <= 3) {%>
+            <i class="icon-fire"></i>
+          <%}%>
+        <%}%>
+      </td>
       <td><a href="http://weibo.com/<%- o['weibo'] %>" target="_blank">http://weibo.com/<%- o['weibo'] %></a></td>
       <td><%- o['location'] %></td>
       <td>
