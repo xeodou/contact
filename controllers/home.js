@@ -46,6 +46,7 @@ var listPage = function (req, res) {
       console.log(err);
       return res.render("error", { message: '数据库出错' });
     }
+    console.log(contacts);
     return res.render("home", { contacts: contacts });
   });
 };
@@ -135,7 +136,6 @@ var handleCreate = function (req, res) {
   var tel = req.body.tel || '';
   var weibo = req.body.weibo || '';
   var location = req.body.location || '';
-
   if (!name || !isName(name)) {
     return res.render("error", { message: '没填名字或名字不合法' });
   }
@@ -145,8 +145,22 @@ var handleCreate = function (req, res) {
   if (!tel) {
     return res.render("error", { message: '没填电话号码' });
   }
-
-  var data = {'name': name, 'id': id, 'tel': tel, 'weibo': weibo, 'location': location};
+  var data = contactsModel.contact;
+  data.name = name;
+  data.id = id;
+  data.weibo = weibo;
+  data.location = location;
+  data.tel = [];
+  if (typeof tel === 'string') {
+    data.tel.push([tel,utils.formatDate(Date.now())]);
+  } else if (typeof tel === 'object'){
+    for(var t in tel){
+      if(tel[t]){
+        data.tel.push([tel[t],utils.formatDate(Date.now())]);
+      }
+    }
+  }
+  // var data = {'name': name, 'id': id, 'tel': tel, 'weibo': weibo, 'location': location};
   contactsModel.insert(data, function (err, result) {
     if (err) {
       console.log(err);
@@ -172,8 +186,22 @@ var handleUpdate = function (req, res) {
   if (!tel) {
     return res.render("error", { message: '没填电话号码' });
   }
-
-  var data = {'name': name, 'tel': tel, 'weibo': weibo, 'location': location};
+  var data = contactsModel.contact;
+  data.id = id;
+  data.name = name;
+  data.weibo = weibo;
+  data.location = location;
+  data.tel = [];
+  if (typeof tel === 'string') {
+    data.tel.push([tel,utils.formatDate(Date.now())]);
+  } else if (typeof tel === 'object'){
+    for(var t in tel){
+      if(tel[t]){
+        data.tel.push([tel[t],utils.formatDate(Date.now())]);
+      }
+    }
+  }
+  // var data = {'name': name, 'tel': tel, 'weibo': weibo, 'location': location};
   contactsModel.update(id, data, function (err) {
     if (err) {
       console.log(err);
