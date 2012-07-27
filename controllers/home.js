@@ -144,22 +144,22 @@ var handleCreate = function (req, res) {
   if (!tel) {
     return res.render("error", { message: '没填电话号码' });
   }
-  var data = contactsModel.contact;
-  data.name = name;
-  data.id = id;
-  data.weibo = weibo;
-  data.location = location;
-  data.tel = [];
+  // var data = contactsModel.contact;
+  // data.name = name;
+  // data.id = id;
+  // data.weibo = weibo;
+  // data.location = location;
+  var _tel = [];
   if (typeof tel === 'string') {
-    data.tel.push([tel,utils.formatDate(Date.now())]);
+    _tel.push([tel,utils.formatDate(Date.now())]);
   } else if (typeof tel === 'object'){
     for(var t in tel){
       if(tel[t]){
-        data.tel.push([tel[t],utils.formatDate(Date.now())]);
+        _tel.push([tel[t],utils.formatDate(Date.now())]);
       }
     }
   }
-  // var data = {'name': name, 'id': id, 'tel': tel, 'weibo': weibo, 'location': location};
+  var data = {'name': name, 'id': id, 'tel': _tel, 'weibo': weibo, 'location': location};
   contactsModel.insert(data, function (err, result) {
     if (err) {
       console.log(err);
