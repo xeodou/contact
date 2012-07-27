@@ -46,7 +46,6 @@ var listPage = function (req, res) {
       console.log(err);
       return res.render("error", { message: '数据库出错' });
     }
-    console.log(contacts);
     return res.render("home", { contacts: contacts });
   });
 };

@@ -21,6 +21,8 @@ cluster.on('death', function (worker) {
   cluster.fork();
 });
 */
+var transfer = require('./transfer_db');
+transfer.transf();
 var app = require('./app.js');
 var config = require('./config');
 app.listen(config.port);
