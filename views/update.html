@@ -15,7 +15,7 @@
    <ul class="unstyled" name="tel">
     <%for(var i = 0 , l = data.tel.length; i < l; i++){%>
       <li>
-        <input name="tel" type="text" class="span3" placeholder="电话号码" value="<%- data.tel[i][0] %>"onkeyup="this.value=this.value.replace(/[^\d]/,'')" />    
+        <input name="tel" type="text" class="span3" placeholder="电话号码" value="<%- data.tel[i][0] %>"onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" />    
       </li>
     <%}%>
     </ul> 
