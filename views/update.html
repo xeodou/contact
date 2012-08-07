@@ -12,7 +12,14 @@
   </div>
   <div class="control-group">
     <label>电话号码</label>
-    <input name="tel" type="text" class="span3" placeholder="电话号码" value="<%- data.tel %>" />
+   <ul class="unstyled" name="tel">
+    <%for(var i = 0 , l = data.tel.length; i < l; i++){%>
+      <li>
+        <input name="tel" type="text" class="span3" placeholder="电话号码" value="<%- data.tel[i][0] %>"onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" />    
+      </li>
+    <%}%>
+    </ul> 
+    <button class="btn btn-info" type="button" onclick="addTelRow();">添加</button>
     <span class="help-block"></span>
   </div>
   <div class="control-group">
@@ -30,3 +37,11 @@
   <input type="submit" class="btn btn-success" value="提交" />
   <a href="/">取消</a>
 </form>
+<script type="text/javascript">
+  function addTelRow(){
+    var ul = document.getElementsByClassName('unstyled')[0];
+    var li = document.createElement('li');
+    li.innerHTML = '<input name=\'tel\' type=\"text\" class=\"span3\" placeholder=\"电话号码\" onkeyup=\"this.value=this.value.replace(/[^\\d]/,\'\')\" />';
+    ul.appendChild(li);
+  }
+</script>

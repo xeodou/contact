@@ -23,6 +23,11 @@ var isId = function (id) {
   if (p.exec(id)) return true;
   return false;
 };
+var isPhone = function(phone){
+  var p = /^0{0,1}(13[0-9]|15[0-9])[0-9]{8}$/;
+  if (p.exec(phone)) return true;
+  return false;
+};
 
 String.prototype.trim = function () {
   return this.replace(/(^\s*)|(\s*$)/g, "");
@@ -135,7 +140,6 @@ var handleCreate = function (req, res) {
   var tel = req.body.tel || '';
   var weibo = req.body.weibo || '';
   var location = req.body.location || '';
-
   if (!name || !isName(name)) {
     return res.render("error", { message: '没填名字或名字不合法' });
   }
@@ -146,7 +150,23 @@ var handleCreate = function (req, res) {
     return res.render("error", { message: '没填电话号码' });
   }
 
-  var data = {'name': name, 'id': id, 'tel': tel, 'weibo': weibo, 'location': location};
+  var _tel = [];
+  if (typeof tel === 'string') {
+    if(!isPhone(tel)){
+      return res.render("error",{ message: "非法手机号"});
+    }
+    _tel.push([tel,utils.formatDate(Date.now())]);
+  } else if (typeof tel === 'object'){
+    for(var t in tel){
+      if(tel[t]){
+        if(!isPhone(tel[t])){
+          return res.render("error",{ message: "非法手机号"});
+        }
+        _tel.push([tel[t],utils.formatDate(Date.now())]);
+      }
+    }
+  }
+  var data = {'name': name, 'id': id, 'tel': _tel, 'weibo': weibo, 'location': location};
   contactsModel.insert(data, function (err, result) {
     if (err) {
       console.log(err);
@@ -172,8 +192,28 @@ var handleUpdate = function (req, res) {
   if (!tel) {
     return res.render("error", { message: '没填电话号码' });
   }
-
-  var data = {'name': name, 'tel': tel, 'weibo': weibo, 'location': location};
+  var data = contactsModel.contact;
+  data.id = id;
+  data.name = name;
+  data.weibo = weibo;
+  data.location = location;
+  data.tel = [];
+  if (typeof tel === 'string') {
+    if(!isPhone(tel)){
+      return res.render("error",{ message: "非法手机号"});
+    }
+    data.tel.push([tel,utils.formatDate(Date.now())]);
+  } else if (typeof tel === 'object'){
+    for(var t in tel){
+      if(tel[t]){
+        if(!isPhone(tel)){
+          return res.render("error",{ message: "非法手机号"});
+        }
+        data.tel.push([tel[t],utils.formatDate(Date.now())]);
+      }
+    }
+  }
+  // var data = {'name': name, 'tel': tel, 'weibo': weibo, 'location': location};
   contactsModel.update(id, data, function (err) {
     if (err) {
       console.log(err);

@@ -4,6 +4,15 @@ var db = client.db(mongo.url);
 var contacts = db.collection(mongo.collections.contacts);
 contacts.ensureIndex({'id': 1}, {'unique': true}, function() { });
 
+var contact = {
+	'id' : '',
+	'name' :　'',
+	'weibo' : '',
+	'location' : '',
+	'tel' : []
+};
+exports.contact = contact;
+
 exports.insert = function (data, next) {
   contacts.insert(data, next);
 };
