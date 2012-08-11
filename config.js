@@ -20,5 +20,5 @@ config.mongo.url = '127.0.0.1:27017/contact';
 config.mongo.collections = {
   'contacts': 'contacts',
 };
-config.debug = false;
+config.debug = true;
 module.exports = config;
