@@ -3,6 +3,7 @@
   <button class="close" data-dismiss="alert">×</button>
   <strong>注意！</strong> 添加前请仔细检查一下之前是否已经添加过了，一个学号只能有一条记录。<br />如果之前已经添加过，可以直接在之前的信息上进行修改或者先删除后再重新添加。
 </div>
+<div id="info"></div>
 <form action="/create.do" method="POST">
   <div class="control-group">
     <label>尊姓大名</label>
@@ -53,7 +54,9 @@
       if(arr.indexOf(input) < 0){
         arr.push(input);
       } else{
-        alert('输入的电话重复');
+        // alert('输入的电话重复');
+        $("#info").append('<div class="alert alert-block alert-error fade in"><a class="close" data-dismiss="alert" href="#">&times;</a><strong>警告！</strong>输入的手机号码重复！</div>');
+        $("html, body").animate({ scrollTop: 0 }, 120);
         commit = false;
       }
     });

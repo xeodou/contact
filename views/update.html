@@ -1,4 +1,5 @@
 <h1>编辑</h1>
+<div id="info"></div>
 <form action="/update.do" method="POST">
   <div class="control-group">
     <label>尊姓大名</label>
@@ -52,8 +53,9 @@
       if(arr.indexOf(input) < 0){
         arr.push(input);
       } else{
-        alert('输入的电话重复');
-        commit = false;
+       $("#info").append('<div class="alert alert-block alert-error fade in"><a class="close" data-dismiss="alert" href="#">&times;</a><strong>警告！</strong>输入的手机号码重复！</div>');
+       $("html, body").animate({ scrollTop: 0 }, 120);        
+       commit = false;
       }
     });
     return commit;
