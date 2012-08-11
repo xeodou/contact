@@ -35,7 +35,7 @@
     <span class="help-block">可不填，但是建议填，方便蹭饭</span>
   </div>
   <input type="hidden" name="_csrf" value="<%- _csrf %>" />
-  <input type="submit" class="btn btn-success" value="提交" />
+  <input type="submit" class="btn btn-success" value="提交"/>
   <a href="/">取消</a>
 </form>
 <script type="text/javascript">
@@ -45,4 +45,21 @@
     li.innerHTML = '<input name=\'tel\' type=\"text\" class=\"span3\" placeholder=\"电话号码\" onkeyup=\"this.value=this.value.replace(/[^\\d]/,\'\')\" />';
     ul.appendChild(li);
   }
+  function check(){
+    var arr = [];
+    var commit = true;
+    $("input[name='tel']").each(function(){
+      var input = $(this)[0].value;
+      if(arr.indexOf(input) < 0){
+        arr.push(input);
+      } else{
+        alert('输入的电话重复');
+        commit = false;
+      }
+    });
+    return commit;
+  }
+$("form").submit(function(){
+  return check();;
+});
 </script>
