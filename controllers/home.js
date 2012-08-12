@@ -157,10 +157,15 @@ var handleCreate = function (req, res) {
     }
     _tel.push([tel,utils.formatDate(Date.now())]);
   } else if (typeof tel === 'object'){
+    var arr = tel;
     for(var t in tel){
       if(tel[t]){
         if(!isPhone(tel[t])){
           return res.render("error",{ message: "非法手机号"});
+        }
+        arr = arr.slice(t+1);
+        if (arr.indexOf(tel[t]) >= 0) {
+          return res.render("error", {message : "手机号码重复"});
         }
         _tel.push([tel[t],utils.formatDate(Date.now())]);
       }
@@ -204,10 +209,15 @@ var handleUpdate = function (req, res) {
     }
     data.tel.push([tel,utils.formatDate(Date.now())]);
   } else if (typeof tel === 'object'){
+    var arr = tel;
     for(var t in tel){
       if(tel[t]){
-        if(!isPhone(tel)){
+        if(!isPhone(tel[t])){
           return res.render("error",{ message: "非法手机号"});
+        }
+        arr = arr.slice(t+1);
+        if (arr.indexOf(tel[t]) >= 0) {
+          return res.render("error", {message : "手机号码重复"});
         }
         data.tel.push([tel[t],utils.formatDate(Date.now())]);
       }
