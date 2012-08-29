@@ -1,12 +1,20 @@
 <h1>登录</h1>
 <p>请回答以下问题</p>
-<form action="/login.do" method="POST">
-<% for (var i = 0, l = q.length; i < l; i++) { %>
-  <div class="control-group">
-    <span class="help-block"><%- q[i][0] %></span>
-    <input name="a[]" type="text" class="span3" placeholder="" />
+<% if(message && message.length > 0) {%>
+  <div class="alert alert-info">
+    <button class="close" data-dismiss="alert">&times;</button>
+    <strong>提示</strong><%- message %>
   </div>
-<% } %>
+<%}%>
+<form action="/login.do" method="POST">
+  <div class="control-group">
+    <span class="help-block">用户名:</span>
+    <input name="name" type="text" class="span3" placeholder="" />
+    <div class="control">
+      <span class="help-block">密码:</span>
+      <input name="pass" type="password" class="span3" placeholder=""/>
+    </div>
+  </div>
   <div class="control-group">
     <label class="checkbox">
       <input type="checkbox" name="remeber"> 记住我
