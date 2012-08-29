@@ -18,7 +18,7 @@ exports.insert = function (data, next) {
 };
 
 exports.find = function (next) {
-  contacts.find({}, {_id: 0}).sort('id', 'asc').toArray(next);
+  contacts.find({'hidden':{$ne:true}}, {_id: 0, hidden:false}).sort('id', 'asc').toArray(next);
 };
 
 exports.findOne = function (id, next) {
