@@ -65,7 +65,7 @@ var listPage = function (req, res) {
 };
 
 var loginPage = function (req, res) {
-  return res.render("login", {message: '如果你是第一次登录，初始密码为：123456，登录后请及时更改!'});
+  return res.render("login", {message: '如果你是第一次登录，登录后请及时更改!'});
 };
 
 var createPage = function (req, res) {
