@@ -13,12 +13,15 @@ config.statCode = {
   'ILLEGAL_PARAMETER': 4,
   'DUPLICATE': 5,
   'REMOTE_CONN': 6,
+  'CONFIRM_PASS_ERR': 7,
+  'OLD_PASS_ERR': 8
 };
 config.logdir = './tmp/logs';
 config.mongo = {};
 config.mongo.url = '127.0.0.1:27017/contact';
 config.mongo.collections = {
   'contacts': 'contacts',
+  'users' : 'users'
 };
 config.debug = true;
 module.exports = config;

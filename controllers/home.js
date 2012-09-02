@@ -4,6 +4,7 @@
 
 var util = require('util');
 var contactsModel = require('../models/contacts');
+var usersModel = require('../models/users');
 var utils = require('../lib/utils');
 var config = require('../config');
 var auth = require('../auth');
@@ -39,11 +40,19 @@ exports = module.exports = function(app) {
   app.post('/login.do', handleLogin);
   app.get('/logout', handleLogout);
   app.get('/create', createPage);
+  app.get('/download', download);
   app.post('/create.do', handleCreate);
   app.get('/update', updatePage);
   app.post('/update.do', handleUpdate);
   app.post('/delete.do', handleDelete);
+  app.get('/set',setpage);
+  app.post('/user/hidden.do', handleHidden);
+  app.post('/user/resetpass.do', handleResetpass);
 };
+
+var download = function(req, res){
+  return res.render("download",{});
+}
 
 var listPage = function (req, res) {
   contactsModel.find(function (err, contacts) {
@@ -56,12 +65,25 @@ var listPage = function (req, res) {
 };
 
 var loginPage = function (req, res) {
-  return res.render("login", { q: auth });
+  return res.render("login", {message: '如果你是第一次登录，登录后请及时更改!'});
 };
 
 var createPage = function (req, res) {
   return res.render("create", { });
 };
+
+var setpage = function(req, res){
+  var user = req.session.user;
+  contactsModel.findOne(user.name, function(err, result){
+    if(err){
+      return res.render("error", {message:'数据库出错'});
+    }
+    if(!result){
+      return res.render("set",{data:{'id': user.name} ,message:'您还没有添加电话号码到通讯录'});
+    }
+    return res.render("set",{data : result});
+  });
+}
 
 var updatePage = function (req, res) {
   var id = req.query.id || '';
@@ -84,45 +106,84 @@ var updatePage = function (req, res) {
 
 var handleLogin = function (req, res) {
   var query = req.body;
-  if (!query.a) {
+  if (!query.name || !query.pass) {
     return res.render("error", { message: '请完整填写答案' });
   }
-  var ans = query.a;
-  for (var i = 0, l = auth.length; i < l; i++) {
-    if (!ans[i]) {
-      return res.render("error", { message: '请完整填写答案' });
-    }
-    ans[i] = ans[i].trim();
-    var right = auth[i][A];
-    if (util.isArray(right)) {
-      var h = false;
-      for (var j = 0, s = right.length; j < s; j++) {
-        if (ans[i] === right[j]) {
-          h = true;
-          break;
-        }
-      }
-      if (!h) {
-        return res.render("error", { message: '第 ' + (i + 1) + ' 题答错' });
-      }
-    } else {
-      if (ans[i] !== right) {
-        return res.render("error", { message: '第 ' + (i + 1) + ' 题答错' });
-      }
-    }
-  }
-  var autoLogin = query.remeber || '';
+  var name = query.name.trim();
+  var pass = query.pass.trim();
 
-  if (autoLogin) {
-    var timeOut = config.session_timeout;
-    req.session.cookie.expires = new Date(Date.now() + timeOut);
-    req.session.cookie.maxAge = timeOut;
-  } else {
-    req.session.cookie.expires = false;
+  if(!isId(name)){
+        return res.render("error", { message: '非法的用户名' });
   }
-  req.session.user = 'user';
-  return utils.redirect(res, '/', 302);
+  pass = utils.md5(name + pass + name);
+  var defPass = utils.md5(name+'123456'+name);
+  usersModel.findOne(name, function(err, result){
+    if(err){
+      return res.render("error", { message: '数据库错误!' });
+    }
+    if(!result || result.name.length <= 0 || result.pass.length <= 0){
+      return res.render("error", { message: '没有该用户!' });
+    }
+    if( pass != result.pass){
+      return res.render("error",{message:'密码错误请重新输入'});
+    }
+    // if(pass === defPass){
+
+    // }
+    var autoLogin = query.remeber || '';
+    if (autoLogin) {
+      var timeOut = config.session_timeout;
+      req.session.cookie.expires = new Date(Date.now() + timeOut);
+      req.session.cookie.maxAge = timeOut;
+    } else {
+      req.session.cookie.expires = false;
+    }
+    req.session.user = {'name':name};
+    return utils.redirect(res, '/', 302);
+  });
 };
+
+
+var handleResetpass = function(req, res){
+  var response = { 'stat': statCode['UNKNOWN'] };
+  var old_pass = req.body.old_pass.trim() || '';
+  var new_pass = req.body.new_pass.trim() || '';
+  var re_new_pass = req.body.re_new_pass.trim() || '';
+  var user = req.session.user;
+  var name = user.name;
+  if(!old_pass || !new_pass || !re_new_pass){
+    response.stat  = statCode['ILLEGAL_PARAMETER'];
+    return utils.sendJSON(res, 200, response);
+  }
+  if(new_pass !== re_new_pass){
+    console.log(new_pass === re_new_pass);
+    response.stat = statCode['CONFIRM_PASS_ERR'];
+    return utils.sendJSON(res, 200, response);
+  }
+  old_pass = utils.md5(name+old_pass+name);
+  new_pass = utils.md5(name+new_pass+name);
+  usersModel.findOne(name, function(err, result){
+    if(err){
+      console.log(err);
+      response.stat = statCode['DATABASE_ERR'];
+      return utils.sendJSON(res, 500, response);
+    }
+    if(old_pass != result.pass){
+      response.stat = statCode['OLD_PASS_ERR'];
+      return utils.sendJSON(res, 200, response);
+    }
+    var data = {'pass':new_pass};
+    usersModel.update(name, data, function(err){
+      if(err){
+        console.log(err);
+        response.stat = statCode['DATABASE_ERR'];
+        return utils.sendJSON(res, 500, response);
+      }
+      response.stat = statCode['SUCCEED'];
+      return utils.sendJSON(res, 200, response);
+    })
+  });
+}
 
 var handleLogout = function (req, res) {
   req.session.destroy(function (err) {
@@ -171,11 +232,31 @@ var handleCreate = function (req, res) {
       }
     }
   }
-  var data = {'name': name, 'id': id, 'tel': _tel, 'weibo': weibo, 'location': location};
+  var data = {'name': name, 'id': id, 'tel': _tel, 'weibo': weibo, 'location': location,'hidden' : false};
   contactsModel.insert(data, function (err, result) {
     if (err) {
       console.log(err);
       return res.render("error", { message: '数据库出错' });
+    }
+    return utils.redirect(res, '/', 302);
+  });
+};
+
+var handleHidden = function(req, res){
+  var hidden = req.body.hidden;
+  var user = req.session.user;
+  if (!user.name) {
+      return utils.redirect(res, '/',302);
+  }
+  if(typeof hidden === "string"){
+    if(hidden === "true") hidden = true;
+    if(hidden === "false") hidden = false;
+  }
+  var data = { 'hidden' : hidden};
+  contactsModel.update(user.name, data,function(err){
+    if(err){
+      console.log(err);
+      return res.render("error",{message: '数据库出错！'});
     }
     return utils.redirect(res, '/', 302);
   });
@@ -224,12 +305,21 @@ var handleUpdate = function (req, res) {
     }
   }
   // var data = {'name': name, 'tel': tel, 'weibo': weibo, 'location': location};
-  contactsModel.update(id, data, function (err) {
-    if (err) {
+  contactsModel.findOne(id, function(err, result){
+    if(err){
       console.log(err);
-      return res.render("error", { message: '数据库出错' });
+      return res.render("error", {message:'数据库出错！'});
     }
-    return utils.redirect(res, '/', 302);
+    if(!result){
+      handleCreate(req, res);
+    }
+      contactsModel.update(id, data, function (err) {
+      if (err) {
+        console.log(err);
+        return res.render("error", { message: '数据库出错' });
+      }
+      return utils.redirect(res, '/', 302);
+    });
   });
 };
 

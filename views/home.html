@@ -9,7 +9,6 @@
       <th style="width:100px;">电话号码</th>
       <th>微博</th>
       <th>所在地</th>
-      <th style="width:70px;"></th>
     </tr>
   </thead>
   <tbody>
@@ -33,16 +32,13 @@
       </td>
       <td><a href="http://weibo.com/<%- o['weibo'] %>" target="_blank">http://weibo.com/<%- o['weibo'] %></a></td>
       <td><%- o['location'] %></td>
-      <td>
-        <a href="/update?id=<%- o['id'] %>">编辑</a> | 
-        <a class="doDelete" data="<%- o['id'] %>" href="/delete?id=<%- o['id'] %>">删除</a>
-      </td>
     </tr>
 <%
   }
 %>
   </tbody>
 </table>
+<!--
 <script>
 var _csrf = '<%- _csrf %>';
 var alertAreaNode = $(".alert-area");
@@ -87,3 +83,4 @@ $(".doDelete").live("click", function () {
   return false;
 });
 </script>
+-->
