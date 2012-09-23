@@ -25,7 +25,7 @@ var isId = function (id) {
   return false;
 };
 var isPhone = function(phone){
-  var p = /^0{0,1}(13[0-9]|15[0-9])[0-9]{8}$/;
+  var p = /^0{0,1}(13[0-9]|15[0-9]|18[0-9])[0-9]{8}$/;
   if (p.exec(phone)) return true;
   return false;
 };
