@@ -22,10 +22,10 @@ cluster.on('death', function (worker) {
 });
 */
 //create user 3080703101-41
-var create = require('./createusers.js');
-create.createDefaultUser(function(){
-  console.log('compete');
-});
+// var create = require('./createusers.js');
+// create.createDefaultUser(function(){
+//   console.log('compete');
+// });
 var app = require('./app.js');
 var config = require('./config');
 app.listen(config.port);

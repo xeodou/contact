@@ -47,6 +47,11 @@
                     <label class='control-label' for='phone'>微博</label>
                     <div class='controls'>
                         <input class='readonly' id='weibo' name='weibo' size='30' type='text' placeholder="微博" value="<%- data.weibo %>"/>
+                        <% if(data.bind && data.bind.length > 0) {%>
+                          <a href="/set/unbind" class="btn btn-info" id="bindweibo"><%- data.bind %> | 取消绑定</a>
+                        <%} else {%>
+                          <a href="/set/oauth" class="btn primary-btn" id="bindweibo">绑定微博</a>
+                        <%}%>
                         <span class="help-block">没有可不填，如果有，请直接填微博名</span>
                     </div>
                 </div>

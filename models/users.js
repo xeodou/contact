@@ -6,6 +6,7 @@ users.ensureIndex({'name':1}, {'unique':true}, function(){});
 var user = {
 	'name':'',
 	'pass':'123456',
+	'bind' : ''
 };
 exports.user = user;
 

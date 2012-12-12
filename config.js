@@ -16,12 +16,22 @@ config.statCode = {
   'CONFIRM_PASS_ERR': 7,
   'OLD_PASS_ERR': 8
 };
+config.weibo = {
+  'name' : '457493671@qq.com',
+  'pass' : 'xeodou',
+  'cookies' : 'USER_LAST_LOGIN_NAME=457493671%40qq.com;gsid_CTandWM=3_5affa1d9b616dd08a2216e2172d5e1555e'
+}
 config.logdir = './tmp/logs';
 config.mongo = {};
 config.mongo.url = '127.0.0.1:27017/contact';
 config.mongo.collections = {
   'contacts': 'contacts',
-  'users' : 'users'
+  'users' : 'users',
+  'message' : 'message'
 };
 config.debug = true;
+config.appkey = '1898686613';
+config.appsecret = 'a2d3f916a3df774e7193152cfd5e802a';
+config.callback_url = 'http://127.0.0.1:2013/set/auth/success';
+config.callback_cancel_url = 'http://127.0.0.1:2013/set';
 module.exports = config;

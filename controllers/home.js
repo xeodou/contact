@@ -8,6 +8,8 @@ var usersModel = require('../models/users');
 var utils = require('../lib/utils');
 var config = require('../config');
 var auth = require('../auth');
+var weibo = require('weibo');
+var weibo_api = require('./weibo');
 var statCode = config.statCode;
 
 var Q = 0;
@@ -48,6 +50,9 @@ exports = module.exports = function(app) {
   app.get('/set',setpage);
   app.post('/user/hidden.do', handleHidden);
   app.post('/user/resetpass.do', handleResetpass);
+  app.get('/set/oauth', handleOauth);
+  app.get('/set/unbind', handleUnbind);
+  app.get('/set/auth/success', handleOauthSuccess);
 };
 
 var download = function(req, res){
@@ -74,14 +79,21 @@ var createPage = function (req, res) {
 
 var setpage = function(req, res){
   var user = req.session.user;
-  contactsModel.findOne(user.name, function(err, result){
+  contactsModel.findOne(user.name, function(err, contact){
     if(err){
       return res.render("error", {message:'数据库出错'});
     }
-    if(!result){
+    if(!contact){
       return res.render("set",{data:{'id': user.name} ,message:'您还没有添加电话号码到通讯录'});
     }
-    return res.render("set",{data : result});
+    usersModel.findOne(contact.id, function(err, result){
+      if(err){
+        console.log(err);
+        return res.render('error', {message : '数据库出错'});
+      }
+      contact.bind = result.bind;
+      return res.render("set",{data : contact});
+    });
   });
 }
 
@@ -170,7 +182,7 @@ var handleResetpass = function(req, res){
     }
     if(old_pass != result.pass){
       response.stat = statCode['OLD_PASS_ERR'];
-      return utils.sendJSON(res, 200, response);
+      return utils.sendJSON(res, 500, response);
     }
     var data = {'pass':new_pass};
     usersModel.update(name, data, function(err){
@@ -262,6 +274,75 @@ var handleHidden = function(req, res){
   });
 };
 
+var handleOauth = function(req, res){
+  var appkey = config.appkey;
+  var appsecret = config.appsecret;
+  var oauth_callback_url = config.callback_url;
+  weibo.init('weibo', appkey, appsecret, oauth_callback_url);
+  var user = {blogtype: 'weibo'};
+  weibo.get_authorization_url(user, function(err, auth_info){
+    if(err){
+      console.log(err);
+      return res.render('error', {message: '授权出错请重试!'});
+    }
+    return res.redirect(auth_info.auth_url);
+  })
+}
+
+var handleOauthSuccess = function(req, res){
+  var code = req.query.code;
+  contactsModel.findOne(req.session.user.name, function(err, result){
+    if(err){
+      return res.render("error", {message:'数据库出错'});
+    }
+    var current_user = result;
+    var user = { blogtype : 'weibo', oauth_verifier: code};
+    weibo.get_access_token(user, function(err, token){
+      if(err){
+        console.log(err);
+        return res.render('error', {data : current_user},{message : '授权出错请重试!'});
+      }
+      user = {blogtype : 'weibo', access_token: token.access_token, uid: token.uid};
+      weibo.verify_credentials(user,function(err, User){
+        if(err){
+          console.log(err);
+          return res.render('error', {data : current_user}, {message : '授权出错请重试'});
+        }
+        weibo.friendship_create(user, '3038788181', function(err, Friendship){
+          if(err && err.data.error_code !== 20506){
+            console.log(error);
+            return res.render('error', {data : current_user}, {message : '授权出错请重试'});
+          }
+          // console.log(Friendship);
+          current_user.weibo = User.profile_url;
+          usersModel.update(current_user.id, {bind: User.screen_name}, function(err, result){
+            if(err){
+              console.log(err);
+              return res.render('error', {data : current_user}, {message : '数据库出错！'});
+            }
+            current_user.bind = User.screen_name;
+            return res.render('set', {data : current_user});
+          })
+        });
+      });
+    });
+  });
+}
+
+var handleUnbind = function(req, res){
+  var name = req.session.user.name;
+  if(!name && name.length <= 0){
+    return  utils.redirect(res, '/', 302);
+  }
+  usersModel.update(name, { bind : ''}, function(err, result){
+    if(err){
+      console.log(err);
+      return res.render('error', {message : '数据库发生错误'});
+    }
+    return utils.redirect(res, '/set', 302);
+  });
+}
+
 var handleUpdate = function (req, res) {
   var name = req.body.name || '';
   var id = req.body.id || '';
@@ -313,12 +394,30 @@ var handleUpdate = function (req, res) {
     if(!result){
       handleCreate(req, res);
     }
-      contactsModel.update(id, data, function (err) {
+    if(result.tel.toString() == data.tel.toString()){
+      return utils.redirect(res, '/', 302);
+    }
+    contactsModel.update(id, data, function (err) {
       if (err) {
         console.log(err);
         return res.render("error", { message: '数据库出错' });
       }
-      return utils.redirect(res, '/', 302);
+      usersModel.findOne(id, function(err, result){
+        if(err){
+          console.log(err);
+          return res.render("error", {message:'数据库出错'});
+        }
+        console.log(result);
+        if(result.bind && result.bind !== ''){
+          weibo_api.addmsg(result.bind, name + '修改了号码' + tel.toString(), function(err, result){
+            if(err){
+              console.log(err);
+              return res.render("error", {message:'数据库出错'});
+            }
+            return utils.redirect(res, '/', 302);
+          });
+        }
+      })
     });
   });
 };
